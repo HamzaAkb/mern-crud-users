@@ -9,7 +9,9 @@ import {
   FormControl,
   Button,
 } from '@material-ui/core';
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
   margin: {
@@ -22,6 +24,41 @@ const useStyles = makeStyles({
 
 const CreateNewUser = () => {
   const classes = useStyles();
+
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [gender, setGender] = useState('');
+  const [nationality, setNationality] = useState('');
+
+  const nameHandler = (e) => {
+    setName(e.target.value);
+  };
+
+  const ageHandler = (e) => {
+    setAge(e.target.value);
+  };
+
+  const genderHandler = (e) => {
+    setGender(e.target.value);
+  };
+
+  const nationalityHandler = (e) => {
+    setNationality(e.target.value);
+  };
+
+  const submitHandler = () => {
+    const instance = axios.create({ baseURL: 'http://localhost:5000' });
+
+    instance
+      .post('/api/users/add', { name, age, gender, nationality })
+      .then((response) => {
+        console.log('User Added');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <Container maxWidth='sm' className={classes.container}>
       <form>
@@ -30,6 +67,7 @@ const CreateNewUser = () => {
           fullWidth
           label='Name'
           variant='outlined'
+          onChange={nameHandler}
           required
         />
         <Grid container>
@@ -40,10 +78,10 @@ const CreateNewUser = () => {
               variant='outlined'
             >
               <InputLabel id='demo'>Gender</InputLabel>
-              <Select label='Gender' labelId='demo'>
-                <MenuItem value={'male'}>Male</MenuItem>
-                <MenuItem value={'female'}>Female</MenuItem>
-                <MenuItem value={'other'}>Other</MenuItem>
+              <Select label='Gender' labelId='demo' onChange={genderHandler}>
+                <MenuItem value={'Male'}>Male</MenuItem>
+                <MenuItem value={'Female'}>Female</MenuItem>
+                <MenuItem value={'Other'}>Other</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -52,6 +90,8 @@ const CreateNewUser = () => {
               variant='outlined'
               fullWidth={true}
               label='Age'
+              value={age}
+              onChange={ageHandler}
               inputProps={{ maxLength: 2 }}
               className={classes.margin}
             />
@@ -62,17 +102,22 @@ const CreateNewUser = () => {
           fullWidth={true}
           label='Nationality'
           variant='outlined'
+          value={nationality}
+          onChange={nationalityHandler}
           required
         />
-        <Button
-          variant='contained'
-          color='primary'
-          fullWidth={true}
-          size='large'
-          className={classes.margin}
-        >
-          Create
-        </Button>
+        <Link to={{ pathname: '/' }} className={classes.textDecoration}>
+          <Button
+            variant='contained'
+            color='primary'
+            fullWidth={true}
+            size='large'
+            onClick={submitHandler}
+            className={classes.margin}
+          >
+            Create
+          </Button>
+        </Link>
       </form>
     </Container>
   );
